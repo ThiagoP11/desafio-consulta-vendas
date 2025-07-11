@@ -23,23 +23,17 @@ public interface SaleRepository extends JpaRepository<Sale, Long> {
     List<SaleSellerMinDTO> searchSeller(LocalDate minDate, LocalDate maxDate);
 
     @Query(nativeQuery = true,
-            value = "SELECT " +
-                    "TB_SALES.ID, " +
-                    "TB_SALES.DATE, " +
-                    "SUM(TB_SALES.AMOUNT) AS amount, " +
-                    "TB_SELLER.NAME " +
+            value = "SELECT TB_SALES.ID, TB_SALES.DATE, SUM(TB_SALES.AMOUNT) AS amount, TB_SELLER.NAME " +
                     "FROM TB_SALES " +
-                    "INNER JOIN TB_SELLER " +
-                    "ON TB_SALES.SELLER_ID = TB_SELLER.ID " +
+                    "INNER JOIN TB_SELLER ON TB_SALES.SELLER_ID = TB_SELLER.ID " +
                     "WHERE TB_SALES.DATE BETWEEN :minDate AND :maxDate " +
-                    "AND TB_SELLER.NAME LIKE CONCAT('%', :name, '%') " +
+                    "AND LOWER(TB_SELLER.NAME) LIKE LOWER(CONCAT('%', :name, '%')) " +
                     "GROUP BY TB_SALES.ID, TB_SALES.DATE, TB_SELLER.NAME",
 
             countQuery = "SELECT COUNT(*) " +
                     "FROM TB_SALES " +
-                    "INNER JOIN TB_SELLER " +
-                    "ON TB_SALES.SELLER_ID = TB_SELLER.ID " +
+                    "INNER JOIN TB_SELLER ON TB_SALES.SELLER_ID = TB_SELLER.ID " +
                     "WHERE TB_SALES.DATE BETWEEN :minDate AND :maxDate " +
-                    "AND TB_SELLER.NAME LIKE CONCAT('%', :name, '%')")
+                    "AND LOWER(TB_SELLER.NAME) LIKE LOWER(CONCAT('%', :name, '%'))")
     Page<SaleSellerProjection> searchSaleSeller(LocalDate minDate, LocalDate maxDate, String name, Pageable pageable);
 }
